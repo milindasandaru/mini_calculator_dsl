@@ -9,12 +9,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
-  push-to-dockerhub:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,9 +27,12 @@ jobs:
       - name: Run tests
         run: pytest
 
-      - name: Build Docker image
-        run: docker build -t calc-dsl .
+  push-to-dockerhub:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
