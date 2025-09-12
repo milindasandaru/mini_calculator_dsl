@@ -12,7 +12,7 @@ def run(code: str):
 
 def main():
     if len(sys.argv) > 1:
-        with open(sys.arvg[1]) as f:
+        with open(sys.argv[1]) as f:
             code = f.read()
             print(run(code))
     else:
