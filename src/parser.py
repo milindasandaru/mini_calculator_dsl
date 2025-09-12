@@ -32,20 +32,35 @@ class Parser:
         return node
 
     def term(self):
-        # term -> factor ((TIMES|DIVIDE) factor)*
+        # term -> factor ((TIMES|DIVIDE|implicit TIMES) factor)*
         node = self.factor()
-        while self.peek() and self.peek()[0] in ("TIMES", "DIVIDE"):
-            tok_type = self.consume()[0]
-            right = self.factor()
-            # Normalize operator names for evaluator
-            op = "MUL" if tok_type == "TIMES" else "DIV"
-            node = (op, node, right)
+        while True:
+            nxt = self.peek()
+            if nxt and nxt[0] in ("TIMES", "DIVIDE"):
+                tok_type = self.consume()[0]
+                right = self.factor()
+                op = "MUL" if tok_type == "TIMES" else "DIV"
+                node = (op, node, right)
+            # Implicit multiplication when a factor directly follows another
+            elif nxt and nxt[0] in ("NUMBER", "LPAREN"):
+                right = self.factor()
+                node = ("MUL", node, right)
+            else:
+                break
         return node
     
     def factor(self):
         token = self.peek()
         if token is None:
             raise RuntimeError("Unexpected end of input")
+        # Unary plus/minus
+        if token[0] == "PLUS":
+            self.consume("PLUS")
+            return self.factor()
+        if token[0] == "MINUS":
+            self.consume("MINUS")
+            # Represent -x as (0 - x) to reuse evaluator
+            return ("MINUS", ("NUM", 0), self.factor())
         if token[0] == "NUMBER":
             self.consume("NUMBER")
             return ("NUM", token[1])
