@@ -19,4 +19,17 @@ def tokenize(code: str):
     # Convert input string into a list of tokens.
     tokens = []
     for match in re.finditer(token_regex, code):
-        
+        kind = match.lastgroup
+        value = match.group()
+        if kind == "NUMBER":
+            tokens.append((kind, int(value)))
+        elif kind == "SKIP":
+            continue
+        elif kind == "MISMATCH":
+            raise RuntimeError(f"Unexpected character: {value}")
+        else:
+            tokens.append((kind, value))
+    return tokens
+
+if __name__=="__main__":
+    print(tokenize("2 + 3 * (4 - 1)"))
