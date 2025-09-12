@@ -15,4 +15,26 @@ class Parser:
         self.pos += 1
         return token
     
+    def parse(self):
+        return self.expr()
     
+    def expr(self):
+        node = self.term()
+        while self.peek() and self.peek()[0] in ("PLUS", "MINUS"):
+            op = self.consume()[0]
+            right = self.factor()
+            node = (op, node, right)
+            return node
+    
+    def factor(self):
+        token = self.peek()
+        if token[0] == "NUMBER":
+            self.consume("NUMBER")
+            return ("NUM", token[1])
+        elif token[0] == "LPAREN":
+            self.consume("LPAREN")
+            node = self.expr()
+            self.consume("RPAREN")
+            return node
+        else:
+            raise RuntimeError(f"Unexpected token {token}")
