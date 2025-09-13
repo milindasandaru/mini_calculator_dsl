@@ -258,3 +258,7 @@ Future enhancements may include:
 - Modulo operation
 - Improved error messages with position information
 - Syntax highlighting for expressions
+
+---
+
+MIT © 2025 Milinda Sandaruwan
